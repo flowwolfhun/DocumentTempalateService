@@ -1,0 +1,8 @@
+<div>
+    <div v-if="random > 0.5">
+        <button @click="count++">Eggyes {{ count }}</button>
+    </div>
+    <div v-if="random <= 0.5">
+        <button @click="count++">Kettes {{ count }}</button>
+    </div>
+</div>
