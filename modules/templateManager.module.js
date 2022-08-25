@@ -1,57 +1,95 @@
 const fs = require('fs').promises;
 const fsSync = require('fs');
 var html_to_pdf = require('html-pdf-node');
+const path = require('path');
 const config = require('../config.json');
+const uuid = require('uuid');
 
 const VueRender = require ('./vueRender');
+const { resolve } = require('path');
 
 let options = { format: 'A4' };
 class TempateManager {
     templateFileName = ""; //file name from disk
     templateContent  = ""; // template from parameter
     templateData     = {}; //json data to fill template
-    outFileName      = "";
-    outOnlyFile      = false;
-
-    constructor(templateFileName, templateContent, templateData, outFileName, outOnlyFile){
+    
+    outputSetting      = {
+        returnHtml : false,
+        returnPdf : false,
+        writeHtml : false,
+        writePdf : false,
+        fileName : '' //without extension
+    };
+    constructor(templateFileName, templateContent, templateData, outputSetting){
         
         if(templateFileName){
             for(const tp of config.templatePath ) {
-                if(fsSync.existsSync(tp + templateFileName)) {
-                    this.templateFileName = tp + templateFileName;
+                if(fsSync.existsSync(path.resolve( tp , templateFileName))) {
+                    this.templateFileName = path.resolve( tp , templateFileName);
                     break;
                 }
             }
         }
         this.templateContent  = templateContent;
         this.templateData     = templateData;
-        this.outFileName      = config.outPath + outFileName;
-        this.outOnlyFile      = !!outOnlyFile;
+        
+        this.outputSetting = typeof outputSetting === 'string'? JSON.parse(outputSetting) : outputSetting ;
+        if(this.outputSetting.writeHtml || this.outputSetting.writePdf){
+            this.outputSetting.fileName = path.resolve( config.outPath,  this.outputSetting.fileName || uuid.v1());
+        }
     }
 
     Create() {
-try{
-        this.GetTemplate()
-        .then((template)=>{
-            new VueRender().Render(template, this.templateData)
-            .then((rendered)=>{
-
+        let anyProcess = this.outputSetting.returnHtml || this.outputSetting.returnPdf || this.outputSetting.writeHtml || this.outputSetting.writePdf;
+        if(!anyProcess){
+            const myPromise = new Promise((resolve, reject) => {
+                resolve({result: "nothing to do"});
+            });
+            return myPromise;
+        }
+        try{
+            const resultObject = {
+                html : '',
+                pdfBuffer : []
+            }
+            return this.GetTemplate()
+            .then((template)=>{
+                const data = typeof this.templateData === 'string'? JSON.parse(this.templateData) :this.templateData;
+                return new VueRender().Render(template, data);
+            }).then((rendered)=>{
+                
                 let file = { content:  rendered  };
-                html_to_pdf.generatePdf(file, options).then(pdfBuffer => {
-                    if(this.outFileName){
-                        fs.writeFile(this.outFileName, pdfBuffer).then(()=>{
-                        });
-                    }
-                });
-                if(!this.outOnlyFile){
-                    return rendered;
+                resultObject.html = this.outputSetting.returnHtml? rendered: '';
+                if(this.outputSetting.writeHtml){
+                    fs.writeFile(this.outputSetting.fileName+'.html', rendered);
+                }
+                
+                if(this.outputSetting.returnPdf || this.outputSetting.writePdf){
+                    return html_to_pdf.generatePdf(file, options).then(pdfBuffer => {
+                        if(this.outputSetting.writePdf){
+                            fs.writeFile(this.outputSetting.fileName+'.pdf', pdfBuffer).then(()=>{
+
+                            });
+                        }
+                        return pdfBuffer;
+                    })
+                }
+                else{
+                    return null;
                 }
             })
-        })
-    }
-    catch(e){
-        console.error(e);
-    }
+            .then((pdfBuff)=>{
+                resultObject.pdfBuffer = pdfBuff;
+                return resultObject;
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+        }
+        catch(e){
+            console.error(e);
+        }
     }
 
     GetTemplate () {

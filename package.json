@@ -29,6 +29,7 @@
     "moleculer": "^0.14.16",
     "moleculer-web": "^0.10.2",
     "nats": "^2.2.0",
+    "uuid": "^8.3.2",
     "vue": "^3.2.37"
   },
   "engines": {

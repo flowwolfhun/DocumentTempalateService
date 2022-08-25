@@ -7,6 +7,10 @@ const vssr  = require('vue/server-renderer');
 class VueRender {
 
  Render(template, data){
+  data.customFunctions = {};
+  data.builtInFunctions = {
+    TestFunc : TestFunc
+  }
     const promise = new Promise((resolve, reject) =>{
     const app = vue.createSSRApp ({
         data: () => (data),
@@ -22,3 +26,7 @@ class VueRender {
 
 };
 module.exports = VueRender;
+
+function TestFunc(input){
+  return input+' inputted';
+}
