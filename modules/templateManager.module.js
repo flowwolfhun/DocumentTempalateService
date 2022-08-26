@@ -33,7 +33,7 @@ class TempateManager {
         }
         this.templateContent  = templateContent;
         this.templateData     = templateData;
-        
+        outputSetting = outputSetting || this.outputSetting;
         this.outputSetting = typeof outputSetting === 'string'? JSON.parse(outputSetting) : outputSetting ;
         if(this.outputSetting.writeHtml || this.outputSetting.writePdf){
             this.outputSetting.fileName = path.resolve( config.outPath,  this.outputSetting.fileName || uuid.v1());
@@ -51,7 +51,8 @@ class TempateManager {
         try{
             const resultObject = {
                 html : '',
-                pdfBuffer : []
+                pdfBuffer : [],
+                result: "ok"
             }
             return this.GetTemplate()
             .then((template)=>{
@@ -84,11 +85,21 @@ class TempateManager {
                 return resultObject;
             })
             .catch((error) => {
-                console.error(error);
+                
+                console.error(e);
+                const myPromise = new Promise((resolve, reject) => {
+                    resolve({error: "Error in process"});
+                });
+                return myPromise;
             });
         }
         catch(e){
+            
             console.error(e);
+            const myPromise = new Promise((resolve, reject) => {
+                resolve({error: "Error in process"});
+            });
+            return myPromise;
         }
     }
 
