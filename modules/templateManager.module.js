@@ -52,7 +52,8 @@ class TempateManager {
             const resultObject = {
                 html : '',
                 pdfBuffer : [],
-                result: "ok"
+                result: "ok",
+                fileName: this.outputSetting.fileName
             }
             return this.GetTemplate()
             .then((template)=>{
