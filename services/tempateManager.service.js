@@ -46,5 +46,4 @@ function Dummy2(){
     var res = tempateManager.Create();
 }
 Dummy2();
-
 */

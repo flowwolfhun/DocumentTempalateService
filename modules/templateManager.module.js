@@ -87,7 +87,7 @@ class TempateManager {
             })
             .catch((error) => {
                 
-                console.error(e);
+                console.error(error);
                 const myPromise = new Promise((resolve, reject) => {
                     resolve({error: "Error in process"});
                 });

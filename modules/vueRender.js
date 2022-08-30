@@ -4,13 +4,12 @@ const vue = require('vue');
 // Vue's server-rendering API is exposed under `vue/server-renderer`.
 //import { renderToString } from 'vue/server-renderer'
 const vssr  = require('vue/server-renderer');
+const BuiltInFunctions  = require('./BuiltInFunctions');
 class VueRender {
 
  Render(template, data){
   data.customFunctions = {};
-  data.builtInFunctions = {
-    TestFunc : TestFunc
-  }
+  data.builtInFunctions = new BuiltInFunctions();
     const promise = new Promise((resolve, reject) =>{
     const app = vue.createSSRApp ({
         data: () => (data),
@@ -27,6 +26,3 @@ class VueRender {
 };
 module.exports = VueRender;
 
-function TestFunc(input){
-  return input+' inputted';
-}
