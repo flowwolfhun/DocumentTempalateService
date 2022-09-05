@@ -27,8 +27,8 @@ function  Dummy1(){
     const tempateManager =  new TempateManager('demo1.html', null, { count: 666, random:  Math.random()  }, {
         returnHtml : false,
         returnPdf : false,
-        writeHtml : false,
-        writePdf : false,
+        writeHtml : true,
+        writePdf : true,
         fileName : 'dummy1' //without extension
     } );
     tempateManager.Create().then((res)=>{
