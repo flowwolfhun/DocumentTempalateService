@@ -1,9 +1,12 @@
 "use strict";
 
+const { configure } = require('log4js');
 const TempateManager = require('../modules/templateManager.module');
+const config = require('../config.json');
 
 module.exports = {
     name:"tempatemanager",
+    logger : config.logger,
     actions:{
         async create(ctx){
             let templateFileName = ctx.params.templateFileName;
@@ -19,7 +22,7 @@ module.exports = {
 
 //TEST
 //Ok, Ok... This is not the best practice for testing, i know
-/*
+
 function  Dummy1(){
     const tempateManager =  new TempateManager('demo1.html', null, { count: 666, random:  Math.random()  }, {
         returnHtml : false,
@@ -33,8 +36,8 @@ function  Dummy1(){
     });
 }
 Dummy1();
-*/
-/*
+
+
 function Dummy2(){
     const tempateManager =  new TempateManager('demo2.html', null, { items: [{message: 'x1'}, {message: 'x2'}, {message: 'xn'}]  },{
         returnHtml : true,
@@ -46,4 +49,4 @@ function Dummy2(){
     var res = tempateManager.Create();
 }
 Dummy2();
-*/
+

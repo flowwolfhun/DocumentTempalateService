@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "html-pdf-node": "^1.0.8",
+    "log4js": "^6.6.1",
     "moleculer": "^0.14.16",
     "moleculer-web": "^0.10.2",
     "nats": "^2.2.0",

@@ -8,8 +8,10 @@ const uuid = require('uuid');
 const VueRender = require ('./vueRender');
 const { resolve } = require('path');
 
+const ModuleBase = require('./ModuleBase');
+
 let options = { format: 'A4' };
-class TempateManager {
+class TempateManager extends ModuleBase {
     templateFileName = ""; //file name from disk
     templateContent  = ""; // template from parameter
     templateData     = {}; //json data to fill template
@@ -22,7 +24,7 @@ class TempateManager {
         fileName : '' //without extension
     };
     constructor(templateFileName, templateContent, templateData, outputSetting){
-        
+        super();
         if(templateFileName){
             for(const tp of config.templatePath ) {
                 if(fsSync.existsSync(path.resolve( tp , templateFileName))) {
@@ -38,6 +40,7 @@ class TempateManager {
         if(this.outputSetting.writeHtml || this.outputSetting.writePdf){
             this.outputSetting.fileName = path.resolve( config.outPath,  this.outputSetting.fileName || uuid.v1());
         }
+        this.logger.debug("TemplateMangerModule initet");
     }
 
     Create() {
@@ -86,8 +89,7 @@ class TempateManager {
                 return resultObject;
             })
             .catch((error) => {
-                
-                console.error(error);
+                this.logger.error(error);
                 const myPromise = new Promise((resolve, reject) => {
                     resolve({error: "Error in process"});
                 });
@@ -95,8 +97,7 @@ class TempateManager {
             });
         }
         catch(e){
-            
-            console.error(e);
+            this.logger.error(error);
             const myPromise = new Promise((resolve, reject) => {
                 resolve({error: "Error in process"});
             });
