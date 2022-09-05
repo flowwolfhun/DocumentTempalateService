@@ -25,9 +25,13 @@
     "moleculer-repl": "^0.6.6"
   },
   "dependencies": {
+    "html-pdf-node": "^1.0.8",
+    "log4js": "^6.6.1",
+    "moleculer": "^0.14.16",
     "moleculer-web": "^0.10.2",
     "nats": "^2.2.0",
-    "moleculer": "^0.14.16"
+    "uuid": "^8.3.2",
+    "vue": "^3.2.37"
   },
   "engines": {
     "node": ">= 12.x.x"
