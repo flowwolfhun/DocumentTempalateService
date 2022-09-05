@@ -38,9 +38,31 @@ class TempateManager extends ModuleBase {
         outputSetting = outputSetting || this.outputSetting;
         this.outputSetting = typeof outputSetting === 'string'? JSON.parse(outputSetting) : outputSetting ;
         if(this.outputSetting.writeHtml || this.outputSetting.writePdf){
-            this.outputSetting.fileName = path.resolve( config.outPath,  this.outputSetting.fileName || uuid.v1());
+            this.outputSetting.fileName = this.GetOutputFileName();
         }
         this.logger.debug("TemplateMangerModule initet");
+    }
+
+    GetOutputFileName(){        
+        let filenameRequest = this.outputSetting.fileName || uuid.v1();
+        if(config.renameIfFileExist){
+            return path.resolve(config.outPath,filenameRequest);
+        }
+        let counter = 0;
+        let availableFileName = '';
+        while(!availableFileName){
+
+            let postfix = counter>0?("_"+counter):'';
+
+            if(!(fsSync.existsSync(path.resolve( config.outPath, filenameRequest )+postfix+".html") ||  
+            fsSync.existsSync(path.resolve( config.outPath, filenameRequest )+postfix+".pdf"))){
+                availableFileName = path.resolve( config.outPath, filenameRequest )+postfix;
+            }
+            else{
+                counter++;
+            }
+        }
+        return path.resolve(config.outPath,availableFileName);
     }
 
     Create() {
