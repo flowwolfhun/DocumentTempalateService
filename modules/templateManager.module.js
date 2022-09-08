@@ -11,7 +11,7 @@ const { resolve } = require('path');
 const ModuleBase = require('./ModuleBase');
 
 let options = { format: 'A4' };
-class TempateManager extends ModuleBase {
+class TemplateManager extends ModuleBase {
     templateFileName = ""; //file name from disk
     templateContent  = ""; // template from parameter
     templateData     = {}; //json data to fill template
@@ -107,7 +107,9 @@ class TempateManager extends ModuleBase {
                 }
             })
             .then((pdfBuff)=>{
-                resultObject.pdfBuffer = pdfBuff;
+                if(this.outputSetting.returnPdf){
+                    resultObject.pdfBuffer = pdfBuff;
+                }
                 return resultObject;
             })
             .catch((error) => {
@@ -146,4 +148,4 @@ class TempateManager extends ModuleBase {
     }
 }
 
-module.exports = TempateManager;
+module.exports = TemplateManager;
