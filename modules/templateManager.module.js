@@ -15,6 +15,7 @@ class TemplateManager extends ModuleBase {
     templateFileName = ""; //file name from disk
     templateContent  = ""; // template from parameter
     templateData     = {}; //json data to fill template
+    errorOnContructor = false;
     
     outputSetting      = {
         returnHtml : false,
@@ -34,7 +35,23 @@ class TemplateManager extends ModuleBase {
             }
         }
         this.templateContent  = templateContent;
-        this.templateData     = templateData;
+        
+        if(templateData){
+            try{
+                this.templateData = typeof templateData === 'string'? JSON.parse(templateData) :templateData;
+            }
+            catch(e){
+                try{
+                    let evalout = null;
+                    eval('evalout = '+templateData);
+                    this.templateData = evalout;
+                }
+                catch(ee){
+                    this.errorOnContructor = true;
+                }
+            }
+        }
+        
         outputSetting = outputSetting || this.outputSetting;
         this.outputSetting = typeof outputSetting === 'string'? JSON.parse(outputSetting) : outputSetting ;
         if(this.outputSetting.writeHtml || this.outputSetting.writePdf){
@@ -66,6 +83,7 @@ class TemplateManager extends ModuleBase {
     }
 
     Create() {
+        if(this.errorOnContructor) return {result: "Error in process"};
         let anyProcess = this.outputSetting.returnHtml || this.outputSetting.returnPdf || this.outputSetting.writeHtml || this.outputSetting.writePdf;
         if(!anyProcess){
             const myPromise = new Promise((resolve, reject) => {
@@ -82,7 +100,7 @@ class TemplateManager extends ModuleBase {
             }
             return this.GetTemplate()
             .then((template)=>{
-                const data = typeof this.templateData === 'string'? JSON.parse(this.templateData) :this.templateData;
+                const data = this.templateData;
                 return new VueRender().Render(template, data);
             }).then((rendered)=>{
                 
@@ -108,7 +126,7 @@ class TemplateManager extends ModuleBase {
             })
             .then((pdfBuff)=>{
                 if(this.outputSetting.returnPdf){
-                    resultObject.pdfBuffer = pdfBuff;
+                    resultObject.pdfBuffer = [...pdfBuff];
                 }
                 return resultObject;
             })
